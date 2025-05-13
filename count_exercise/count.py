@@ -1,11 +1,19 @@
 import pandas as pd
 
-dataframe = pd.read_json('count_exercise/pessoas.json')
+def count_class(list):
+    result = {}
+    for item in list:
+        if(item not in result):
+            result[item] = 0
+        result[item] += 1
+    print(result)
 
-names = dataframe['nomes-pessoas']
-
-dictionary = {}
-for nam in names:
-    dictionary[nam] = 0
-
-
+def count_list(list):
+    result = [0, 0, 0]
+    for id in list:
+        if id not in (1, 2, 3): continue
+        result[id-1] += 1
+    print(result)
+        
+count_class([1, 2, 3, 2, '1', 2, 3, 1, 2, 4, 4, 'mar', 'banana', 4, 'mar'])
+count_list([1, 2, 3, 2, '1', 2, 3, 1, 2, 4, 4, 'mar', 'banana', 4, 'mar'])
