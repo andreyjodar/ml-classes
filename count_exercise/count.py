@@ -14,6 +14,6 @@ def count_list(list):
         if id not in (1, 2, 3): continue
         result[id-1] += 1
     print(result)
-        
+
 count_class([1, 2, 3, 2, '1', 2, 3, 1, 2, 4, 4, 'mar', 'banana', 4, 'mar'])
 count_list([1, 2, 3, 2, '1', 2, 3, 1, 2, 4, 4, 'mar', 'banana', 4, 'mar'])
