@@ -28,9 +28,17 @@ def data_set_v2(fname):
     result['nome-arquivo'] = fname
     data = pd.read_csv(fname, skipinitialspace=True)
     process = ['workclass', 'native-country',
-               'race', 'relationship', 'education', 'marital-status', 'occupation', 'sex','class']
+               'race', 'relationship', 'education', 
+               'marital-status', 'occupation', 'sex','class']
     for colname in process:
         transform_values(data, colname)
+
+    classes = data['class']
+
+    dataset = data.drop(columns='class')
+
+    result['dataset'] = dataset
+    result['class'] = classes
 
     return result
 
@@ -48,25 +56,24 @@ def transform_values(data, column):
 
 def print_data(data):
     print('-'*40)
-    ncls = len(data['cls-orig'])
-    print(f'1- possui {ncls} classes')
-    print('2- numero de itens para cada classe:', data['cls-count'])
+    print(f'class -->', data['class'])
+    print(f'dataset -->', data['dataset'])
 
     print('-'*40)
 
-def print_imbalance(data):
-    soma = np.sum(data['cls-count'])
-    result = []
-    for vlr in data['cls-count']:
-        result.append(soma / vlr)
-
-    max = np.max(result)
-    print('desbalanceamento -->', max)
+#def print_imbalance(data):
+#   soma = np.sum(data['cls-count'])
+#    result = []
+#    for vlr in data['cls-count']:
+#        result.append(soma / vlr)
+#
+#    max = np.max(result)
+#    print('desbalanceamento -->', max)
 
 FNAME = '24_06_25/adult.data'
 
 if __name__ == '__main__':
-    data = data_set(FNAME)
+    data = data_set_v2(FNAME)
     print_data(data)
-    print_imbalance(data)
+#    print_imbalance(data)
     
