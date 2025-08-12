@@ -1,0 +1,27 @@
+
+REFERENCIAS MACHINE LEARNING:
+
+TRAIN-TEST--SPLIT:
+	https://www.geeksforgeeks.org/machine-learning/how-to-do-train-test-split-using-sklearn-in-python/
+	https://realpython.com/train-test-split-python-data/
+	https://gist.github.com/jxareas/959ec96c96edcc9585955935a71e5f80
+	
+Supervised Machine Learning
+	https://www.geeksforgeeks.org/machine-learning/supervised-machine-learning/
+
+Algorithms:
+	https://www.geeksforgeeks.org/machine-learning/decision-tree/
+	https://www.geeksforgeeks.org/machine-learning/decision-tree-introduction-example/
+	
+	https://www.geeksforgeeks.org/machine-learning/k-nearest-neighbours/
+	https://www.kaggle.com/code/prashant111/knn-classifier-tutorial
+	https://www.w3schools.com/python/python_ml_knn.asp
+	
+	https://www.geeksforgeeks.org/machine-learning/support-vector-machine-algorithm/
+	https://www.kaggle.com/code/prashant111/svm-classifier-tutorial
+	https://medium.com/data-science/support-vector-machines-explained-with-python-examples-cb65e8172c85
+	https://www.datacamp.com/tutorial/svm-classification-scikit-learn-python
+	
+	https://www.geeksforgeeks.org/machine-learning/naive-bayes-classifiers/
+	
+	https://www.geeksforgeeks.org/deep-learning/sklearn-classification-using-perceptron/
