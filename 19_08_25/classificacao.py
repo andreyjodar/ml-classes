@@ -48,17 +48,24 @@ for _ in range(20):
     perceptron.fit(xtreino, ytreino)
     yhat = perceptron.predict( xteste )
 
-    score = metrics.accuracy_score( yteste, yhat )
-    scores.append(score)
+    precision = metrics.precision_score(yteste, yhat)
+    recall = metrics.recall_score(yteste, yhat)
+
+    f1_score = (2*precision*recall) / (precision + recall)
+    scores.append(f1_score)
 
 mean_score = np.mean(scores)
 
 scores_svc = []
 for _ in range(20):
     svc = SVC(kernel="linear", random_state=None)
-    # perceptron = Perceptron(max_iter=100,random_state=None)
-    # perceptron.fit(xtreino, ytreino)
-    # yhat = perceptron.predict( xteste )
+    svc.fit(xtreino, ytreino)
+    yhat = svc.predict(xteste)
 
-    # score = metrics.accuracy_score( yteste, yhat )
-    # scores.append(score)
+    precision = metrics.precision_score(yteste, yhat)
+    recall = metrics.recall_score(yteste, yhat)
+
+    f1_score = (2*precision*recall) / (precision + recall)
+    scores_svc.append(f1_score)
+    
+mean_svc_score = np.mean(scores_svc)
