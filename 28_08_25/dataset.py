@@ -63,7 +63,7 @@ def data_set(fname):
     classes = list(data[ultima])
     df = data.drop(columns=ultima)
 
-    result['dados'] = df
-    result['classes'] = classes
+    result['dados'] = np.array(df)
+    result['classes'] = np.array(classes)
 
     return result
