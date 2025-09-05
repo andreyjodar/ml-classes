@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 
@@ -29,26 +28,34 @@ def transform_col( data ):
     result['vlr-count'] = list(count)
     return result
 
-
-
 def data_set_v2(fname):
     result = {}
     result['nome-arquivo'] = fname
     data = pd.read_csv(fname, skipinitialspace=True, skip_blank_lines=True)
+
     cols = list(data.columns)
-    process = ['workclass', 'education', 'occupation', 'marital-status', 'relationship', 'race', 'sex', 'native-country']
+    process = ['workclass', 'education', 'occupation', 
+               'marital-status', 'relationship', 'race', 
+               'sex', 'native-country']
+    
     for colname in process:
         if colname not in cols: continue
         dados = data[ colname ]
         ret = transform_col( dados )
         ret['colname'] = colname
-        data.drop( columns=colname )
+        data.drop( columns=colname, inplace=True)
         data[ colname ] = ret['values']
 
-    print(data)
-    result['dados'] = data
-    return result
+    last = cols[-1]
+    last_orig = data[last]
+    cls_orig, classes, cls_count = np.unique(last_orig, return_inverse=True, return_counts=True)
+    data = data.drop(columns=last)
 
+    result['dados'] = data
+    result['classes'] = classes
+    result['cls-orig'] = cls_orig
+    result['cls-count'] = cls_count
+    return result
 
 def dataset_info(data):
     ###################
@@ -59,53 +66,28 @@ def dataset_info(data):
     print('linhas x colunas:', data.shape)
     ###################
 
-
-def data_set( fname ):
-    result = {}
-    result['nome-arquivo'] = fname
-    data = pd.read_csv(fname)
-
-    cols = data.columns
-
-    ultima = cols[-1]
-    nome_orig = data[ultima]
-    cls_orig, classes, cls_cnt = np.unique(nome_orig, return_inverse=True, return_counts=True)
-
-    df = data.drop( columns=ultima )
-
-    result['dados'] = df
-    result['classes'] = classes
-    result['cls-orig'] = cls_orig
-    result['cls-count'] = cls_cnt
-
-    return result
-
-
 def show_dataset(data):
     print('-'*40)
 
-    dataset_info(data)
+    dataset_info(data['dados'])
     ncls = len( data['cls-orig'] )
     print(f'1- possui {ncls} classes')
     print('2- numero de itens para cada classe:', data['cls-count'])
     print('-'*40)
-
-
 
 def show_unbalanced(data):
     soma = np.sum( data['cls-count'] )
     result = []
     for vlr in data['cls-count']:
         result.append( soma / vlr )
-    max = np.max( result )
-    print('desbalanceamento -->', max)
-
+    max_val = np.max( result )
+    print('desbalanceamento -->', max_val)
 
 FNAME = '04_09_25/adult.csv'
 
 if __name__ == '__main__':
     data = data_set_v2(FNAME)
     
-    #show_dataset(data)
-    #show_unbalanced(data)
+    show_dataset(data)
+    show_unbalanced(data)
 

@@ -1,13 +1,10 @@
-
 # pip install scikit-learn
 # pip install pandas
-
 
 import numpy as np
 from random import shuffle
 from sklearn import metrics
 
-from sklearn.datasets import fetch_openml
 from dataset_v2 import data_set_v2
 
 from sklearn.linear_model import Perceptron
@@ -20,107 +17,87 @@ FNAME = "04_09_25/adult.csv"
 
 def load_dataset(fname):
     data = data_set_v2(fname)
-    norm_column = ['age', 'final_weight', 'education-num', 'hour-per-week']
-    drop_column = ['capital-gain', 'capital-loss']
-    for colname in drop_column:
-        data["dados"].drop( columns=colname )
+    norm_columns = ['age', 'final_weight', 'education-num', 'hours-per-week']
+    drop_columns = ['capital-gain', 'capital-loss']
 
-    for colname in norm_column:
-        column = data['dados'][colname]
-        
-    # normalizacao.. (age, final_weight, education, capital-gain, capital-loss, hours-per-week)
-    # normalizar os dados entre minimo e maximo
+    dataframe = data['dados']
+    dataframe.drop( columns=drop_columns, inplace=True)
 
-    # transformar dados categoricos em numeros
-    # ao retornar o 'data', retornar o dataset já todo em números..
+    for colname in norm_columns:
+        col_min = dataframe[colname].min()
+        col_max = dataframe[colname].max()
+
+        dataframe[colname] = (dataframe[colname] - col_min) / (col_max - col_min)
+
+    data['dados'] = np.array(dataframe)
     return data
 
+def initalize_classifiers():
+    rng = np.random.RandomState()
 
-data = load_dataset(FNAME)
-alldata = data.data
-alltarg = data.target
+    perceptron = Perceptron(max_iter=100,random_state=rng)
+    model_svc = SVC(probability=True, gamma='auto',random_state=rng)
+    model_bayes = GaussianNB()
+    model_tree = DecisionTreeClassifier(random_state=rng, max_depth=10)
+    model_knn = KNeighborsClassifier(n_neighbors=7)
 
-
-results = {
-            'perceptron':   [],
-            'svm':          [],
-            'bayes':        [],
-            'trees':        [],
-            'knn':          []
-}
-
-rng = np.random.RandomState()
-
-def get_cv_value(xdata, ytarg):
-
-    part = int(len(ytarg)*0.8) # assumindo 80%
-    parcial_result = {
-                'perceptron':   [],
-                'svm':          [],
-                'bayes':        [],
-                'trees':        [],
-                'knn':          []
+    classifiers = {    
+        'perceptron':   perceptron,
+        'svm':          model_svc,
+        'bayes':        model_bayes,
+        'trees':        model_tree,
+        'knn':          model_knn
     }
 
-    for crossv in range(5):
+    return classifiers
 
-        # xtr --> x_treino  ;  xte --> x_teste
-        xtr = xdata[ :part ]
-        ytr = ytarg[ :part ]
-        xte = xdata[ part: ]
-        yte = ytarg[ part: ]
+def calculate_crossvalid(xdata, ytarg, classifiers):
+    num_folds = 5
+    fold_size = len(ytarg) // num_folds
+    parcial_result = {clfs_name: [] for clfs_name in classifiers.keys()}
 
+    for fold in range(num_folds):
+        print(f"Fold {fold + 1}")
+        start = fold * fold_size
+        end = (fold + 1) * fold_size
+        
+        x_test = xdata[start:end]
+        y_test = ytarg[start:end]
 
-        perceptron = Perceptron(max_iter=100,random_state=rng)
-        model_svc = SVC(probability=True, gamma='auto',random_state=rng)
-        model_bayes = GaussianNB()
-        model_tree = DecisionTreeClassifier(random_state=rng, max_depth=10)
-        model_knn = KNeighborsClassifier(n_neighbors=7)
+        x_train = np.concatenate((xdata[:start], xdata[end:]))
+        y_train = np.concatenate((ytarg[:start], ytarg[end:]))
 
-        # colocando todos classificadores criados em um dicionario
-        clfs = {    
-                    'perceptron':   perceptron,
-                    'svm':          model_svc,
-                    'bayes':        model_bayes,
-                    'trees':        model_tree,
-                    'knn':          model_knn
-                }
+        for clf_name, classific in classifiers.items():
+            classific.fit(x_train, y_train)
+            ypred = classific.predict(x_test)
+            
+            f1_score = metrics.f1_score(y_test, ypred, average='macro')
+            parcial_result[clf_name].append(f1_score)
 
-        ytrue = yte
-        #print('Treinando cada classificador e encontrando o score')
-        for clf_name, classific in clfs.items():
-            classific.fit(xtr, ytr)
-            ypred = classific.predict(xte)
-            f1 = metrics.f1_score(ytrue, ypred, average='macro')
-            print(clf_name, '-- f1:', f1)
-            parcial_result[clf_name].append( f1 )
+    return {clf_name: np.mean(scores) for clf_name, scores in parcial_result.items()}
 
+def print_final_mean(final_result):
+    print("=" * 50)
+    for clfs_name, mean in final_result.items():
+        print(f"Classificador: {clfs_name} | F1-Score (Mean): {mean:.4f}")
+    print("=" * 50)
+    
+if __name__ == '__main__':
+    data = load_dataset(FNAME)
+    xdata = data['dados']
+    ytarg = data['classes']
+    classifiers = initalize_classifiers()
+    turns_result = {clfs_name: [] for clfs_name in classifiers.keys()}
 
-        ytarg = list(ytarg[ part: ]) + list(ytarg[ :part ])
-        xdata = list(xdata[ part: ]) + list(xdata[ :part ])
-
-        print('####\n####')
-
-    for clf_name, result in parcial_result.items():
-        value = sum(result)/len(result)
-        print(clf_name, '-->', value)
-        parcial_result[clf_name] = value
-
-    return parcial_result
-
-
-def principal():
-
-    for exec_id in range(3):
-        # embaralhar os dados
-        idx = list(range(len(alltarg)))
+    for turns in range(3):
+        idx = list(range(len(ytarg)))
         shuffle(idx)
-        xdata = alldata[ idx ]
-        ytarg = alltarg[ idx ]
-        ret = get_cv_value(xdata, ytarg)
-        print(ret) # armazenar os resultados e fazer a média deles
+        xdata_shuffle = xdata[idx]
+        ytarg_shuffle = ytarg[idx]
 
+        parcial_result = calculate_crossvalid(xdata_shuffle, ytarg_shuffle, classifiers)
+        for clfs_name, result in parcial_result.items():
+            turns_result[clfs_name].append(result)
 
-principal()
-
-
+    final_result = {clfs_name: np.mean(results) for clfs_name, results in turns_result.items()}
+    print_final_mean(final_result)
