@@ -21,8 +21,10 @@ def load_dataset(fname):
     drop_columns = ['capital-gain', 'capital-loss']
 
     dataframe = data['dados']
+    print(f"Excluindo colunas: 'capital-gain' e 'capital-loss'")
     dataframe.drop( columns=drop_columns, inplace=True)
 
+    print(f"Normalizando Colunas Restantes")
     for colname in norm_columns:
         col_min = dataframe[colname].min()
         col_max = dataframe[colname].max()
@@ -58,14 +60,17 @@ def calculate_crossvalid(xdata, ytarg, classifiers):
 
     for fold in range(num_folds):
         print(f"Fold {fold + 1}")
+
+        test_mask = np.full(len(ytarg), False, dtype=bool)
         start = fold * fold_size
         end = (fold + 1) * fold_size
+        test_mask[start:end] = True
         
-        x_test = xdata[start:end]
-        y_test = ytarg[start:end]
+        x_test = xdata[test_mask]
+        y_test = ytarg[test_mask]
 
-        x_train = np.concatenate((xdata[:start], xdata[end:]))
-        y_train = np.concatenate((ytarg[:start], ytarg[end:]))
+        x_train = xdata[~test_mask]
+        y_train = ytarg[~test_mask]
 
         for clf_name, classific in classifiers.items():
             classific.fit(x_train, y_train)
@@ -77,27 +82,35 @@ def calculate_crossvalid(xdata, ytarg, classifiers):
     return {clf_name: np.mean(scores) for clf_name, scores in parcial_result.items()}
 
 def print_final_mean(final_result):
-    print("=" * 50)
+    print("=" * 52)
     for clfs_name, mean in final_result.items():
-        print(f"Classificador: {clfs_name} | F1-Score (Mean): {mean:.4f}")
-    print("=" * 50)
+        print(f"Classificador: {clfs_name} | F1 Score (Mean): {mean:.4f}")
+    print("=" * 52)
     
 if __name__ == '__main__':
+    print(f"Carregando Dataset Adult.csv")
     data = load_dataset(FNAME)
     xdata = data['dados']
     ytarg = data['classes']
+    print(f"Inicializando Classificadores")
     classifiers = initalize_classifiers()
     turns_result = {clfs_name: [] for clfs_name in classifiers.keys()}
 
     for turns in range(3):
+        print("-" * 52)
+        print(f"Início da Execução {turns + 1}")
+        print(f"Embaralhando Dataset")
         idx = list(range(len(ytarg)))
         shuffle(idx)
         xdata_shuffle = xdata[idx]
         ytarg_shuffle = ytarg[idx]
 
+        print(f"Calculando Cross Validation (F1 Score)")
         parcial_result = calculate_crossvalid(xdata_shuffle, ytarg_shuffle, classifiers)
+        print("-" * 52)
         for clfs_name, result in parcial_result.items():
             turns_result[clfs_name].append(result)
 
+    print(f"Calculando Média Final (F1 Score)")
     final_result = {clfs_name: np.mean(results) for clfs_name, results in turns_result.items()}
     print_final_mean(final_result)
