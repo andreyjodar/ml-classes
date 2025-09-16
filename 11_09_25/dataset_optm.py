@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+from normalize_optm import remove_columns;
+from normalize_optm import normalize_stringcol;
+from normalize_optm import normalize_numcol;
 
 
 # age: continuous.
@@ -19,44 +22,34 @@ import numpy as np
 
 # age, workclass, final_weight, education, education-num, marital-status, occupation, relationship, race, sex, capital-gain, capital-loss, hours-per-week, native-country, class
 
-
-def transform_col( data ):
-    vlr_orig, values, count = np.unique(data, return_inverse=True, return_counts=True)
-    result = {}
-    result['vlr-orig'] = list(vlr_orig)
-    result['values'] = list(values)
-    result['vlr-count'] = list(count)
-    return result
-
-def data_set_v2(fname):
+def data_set(fname):
     result = {}
     result['nome-arquivo'] = fname
+    print("Carregando dataset")
     data = pd.read_csv(fname, skipinitialspace=True, skip_blank_lines=True)
 
     cols = list(data.columns)
-    string_columns = []
-    number_columns = []
-    process = ['workclass', 'education', 'occupation', 
-               'marital-status', 'relationship', 'race', 
-               'sex', 'native-country']
-    
-    for colname in process:
-        if colname not in cols: continue
-        dados = data[ colname ]
-        ret = transform_col( dados )
-        ret['colname'] = colname
-        data.drop( columns=colname, inplace=True)
-        data[ colname ] = ret['values']
+    drop_columns = ['capital-gain', 'capital-loss']
+    string_columns = ['workclass', 'education', 'occupation', 'marital-status', 'relationship', 'race', 'sex', 'native-country']
+    number_columns = ['age', 'final_weight', 'education-num', 'hours-per-week']
+
+    print("Removendo colunas enviesadas")
+    remove_columns(data, drop_columns)
+    print("Normalizando dados qualitativos")
+    normalize_stringcol(data, string_columns)
+    print("Normalizando dados quantitativos")
+    normalize_numcol(data, number_columns)
 
     last = cols[-1]
     last_orig = data[last]
     cls_orig, classes, cls_count = np.unique(last_orig, return_inverse=True, return_counts=True)
     data = data.drop(columns=last)
 
-    result['dados'] = data
+    result['dados'] = np.array(data)
     result['classes'] = classes
     result['cls-orig'] = cls_orig
     result['cls-count'] = cls_count
+    print("-" * 52)
     return result
 
 def dataset_info(data):
@@ -88,7 +81,7 @@ def show_unbalanced(data):
 FNAME = '04_09_25/adult.csv'
 
 if __name__ == '__main__':
-    data = data_set_v2(FNAME)
+    data = data_set(FNAME)
     
     show_dataset(data)
     show_unbalanced(data)

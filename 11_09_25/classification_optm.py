@@ -19,21 +19,6 @@ FNAME = "04_09_25/adult.csv"
 
 def load_dataset(fname):
     data = data_set_v2(fname)
-    norm_columns = ['age', 'final_weight', 'education-num', 'hours-per-week']
-    drop_columns = ['capital-gain', 'capital-loss']
-
-    dataframe = data['dados']
-    print(f"Excluindo colunas: 'capital-gain' e 'capital-loss'")
-    dataframe.drop( columns=drop_columns, inplace=True)
-
-    print(f"Normalizando Colunas Restantes")
-    for colname in norm_columns:
-        col_min = dataframe[colname].min()
-        col_max = dataframe[colname].max()
-
-        dataframe[colname] = (dataframe[colname] - col_min) / (col_max - col_min)
-
-    data['dados'] = np.array(dataframe)
     return data
 
 def initalize_classifiers():
