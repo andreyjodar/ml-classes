@@ -1,0 +1,53 @@
+
+
+-- biblioteca matplotlib
+
+FAZER O 'PLOT' de um gráfico 
+	-- BOXPLOT: mediana, quartil, outlier
+	-- CODIGO BARRAS c/ desv padrao
+
+
+PROGRAMAS:
+	1-SALVAR CSV
+	2-PLOTAR GRÁFICO
+
+	[Programa1:]
+	1-- rodar seu algoritmo com os métodos de classificação visto em sala
+		1.1- Perceptron
+		1.2- SVM
+		1.3- Naive Bayes
+		1.4- KNN
+		1.5- Decision Tree
+
+	2-- guardar Acurácia e F1-Measure para um deles
+	3-- Fazer isso 5 vezes cross-validation
+	4-- Misturar os dados e refazer item 3
+	5-- fazer item 4 por 4vezes, sendo total: 20
+	6-- para cada iteração (20 vezes) armazenar:
+		6.1- acurácia
+		6.2- f1-measure
+	7-- Armazenar todos resultados em um CSV
+
+
+	[Programa2:]
+	1-- abrir o arquivo CSV gerado
+	2-- para cada método, capturar os 20 resultados
+	3-- plotar um gráfico BoxPlot para acurácia
+	4-- plotar um gráfico BoxPlot para f1-measure
+	5-- para cada método calcular a média e desvio padrão
+	
+
+
+EXEMPLOS DE GRÁFICOS EM PYTHON:
+	https://fernandafperes.com.br/blog/interpretacao-boxplot/
+	https://blog.proffernandamaciel.com.br/como-ler-um-boxplot/
+	
+	https://hub.asimov.academy/tutorial/como-criar-e-configurar-um-boxplot-com-python-e-matplotlib/
+	https://www.datacamp.com/tutorial/python-boxplots
+	https://www.geeksforgeeks.org/data-visualization/box-plot-in-python-using-matplotlib/
+
+	https://matplotlib.org/stable/plot_types/stats/index.html
+	https://www.datacamp.com/tutorial/types-of-data-plots-and-how-to-create-them-in-python
+	https://pythonplot.com/
+	https://datacarpentry.github.io/python-socialsci/13-matplotlib.html
+
