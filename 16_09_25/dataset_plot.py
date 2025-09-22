@@ -29,9 +29,9 @@ def data_set(fname):
     data = pd.read_csv(fname, skipinitialspace=True, skip_blank_lines=True)
 
     cols = list(data.columns)
-    drop_columns = ['capital-gain', 'capital-loss']
-    string_columns = ['workclass', 'education', 'occupation', 'marital-status', 'relationship', 'race', 'sex', 'native-country']
-    number_columns = ['age', 'final_weight', 'education-num', 'hours-per-week']
+    drop_columns = []
+    string_columns = ['class','handicapped-infants','water-project-cost-sharing','adoption-of-the-budget-resolution','physician-fee-freeze','el-salvador-aid','religious-groups-in-schools','anti-satellite-test-ban','aid-to-nicaraguan-contras','mx-missile','immigration','synfuels-corporation-cutback','education-spending','superfund-right-to-sue','crime,duty-free-exports','export-administration-act-south-africa']
+    number_columns = []
 
     print("Removendo colunas enviesadas")
     remove_columns(data, drop_columns)
@@ -40,10 +40,10 @@ def data_set(fname):
     print("Normalizando dados quantitativos")
     normalize_numcol(data, number_columns)
 
-    last = cols[-1]
-    last_orig = data[last]
-    cls_orig, classes, cls_count = np.unique(last_orig, return_inverse=True, return_counts=True)
-    data = data.drop(columns=last)
+    targ = cols[0]
+    targ_orig = data[targ]
+    cls_orig, classes, cls_count = np.unique(targ_orig, return_inverse=True, return_counts=True)
+    data = data.drop(columns=targ)
 
     result['dados'] = np.array(data)
     result['classes'] = classes
@@ -78,7 +78,7 @@ def show_unbalanced(data):
     max_val = np.max( result )
     print('desbalanceamento -->', max_val)
 
-FNAME = '04_09_25/adult.csv'
+FNAME = 'datasets/house-votes-84.csv'
 
 if __name__ == '__main__':
     data = data_set(FNAME)

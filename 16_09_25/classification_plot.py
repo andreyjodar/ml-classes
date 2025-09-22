@@ -6,6 +6,7 @@ from random import shuffle
 from sklearn import metrics
 
 from dataset_plot import data_set
+from csv_generator import generate_csv
 
 from sklearn.linear_model import Perceptron
 from sklearn.svm import SVC
@@ -41,7 +42,7 @@ def initalize_classifiers():
 def calculate_crossvalid(xdata, ytarg, classifiers):
     num_folds = 5
     fold_size = len(ytarg) // num_folds
-    parcial_result = {clfs_name: [] for clfs_name in classifiers.keys()}
+    parcial_result = {clfs_name: {"f1-score": [], "accuracy": []} for clfs_name in classifiers.keys()}
 
     for fold in range(num_folds):
         print(f"Fold {fold + 1}")
@@ -62,9 +63,12 @@ def calculate_crossvalid(xdata, ytarg, classifiers):
             ypred = classific.predict(x_test)
             
             f1_score = metrics.f1_score(y_test, ypred, average='macro')
-            parcial_result[clf_name].append(f1_score)
+            accuracy = metrics.accuracy_score(y_test, ypred)
 
-    return {clf_name: np.mean(scores) for clf_name, scores in parcial_result.items()}
+            parcial_result[clf_name]["f1-score"].append(f1_score)
+            parcial_result[clf_name]["accuracy"].append(accuracy)
+
+    return parcial_result
 
 def print_final_mean(final_result):
     print("=" * 52)
@@ -79,9 +83,9 @@ if __name__ == '__main__':
     ytarg = data['classes']
     print(f"Inicializando Classificadores")
     classifiers = initalize_classifiers()
-    turns_result = {clfs_name: [] for clfs_name in classifiers.keys()}
+    final_results = {clfs_name: {"f1-score": [], "accuracy": []} for clfs_name in classifiers.keys()}
 
-    for turns in range(3):
+    for turns in range(4):
         print("-" * 52)
         print(f"Início da Execução {turns + 1}")
         print(f"Embaralhando Dataset")
@@ -93,9 +97,13 @@ if __name__ == '__main__':
         print(f"Calculando Cross Validation (F1 Score)")
         parcial_result = calculate_crossvalid(xdata_shuffle, ytarg_shuffle, classifiers)
         print("-" * 52)
-        for clfs_name, result in parcial_result.items():
-            turns_result[clfs_name].append(result)
+
+        for clfs_name, results in parcial_result.items():
+            final_results[clfs_name]["f1-score"].extend(results["f1-score"])
+            final_results[clfs_name]["accuracy"].extend(results["accuracy"])
+
+    generate_csv(final_results, dataset_name="dataset_name", output_file="final-result.csv")
 
     print(f"Calculando Média Final (F1 Score)")
-    final_result = {clfs_name: np.mean(results) for clfs_name, results in turns_result.items()}
-    print_final_mean(final_result)
+    final_mean = {clfs_name: np.mean() for clfs_name, results in final_results.items()}
+    print_final_mean(final_mean)
