@@ -7,6 +7,7 @@ from sklearn import metrics
 
 from dataset_plot import data_set
 from csv_generator import generate_csv
+from boxplot_generator import plot_boxplot
 
 from sklearn.linear_model import Perceptron
 from sklearn.svm import SVC
@@ -14,7 +15,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-FNAME = "04_09_25/adult.csv"
+FNAME = "datasets/glass.csv"
 
 def load_dataset(fname):
     data = data_set(fname)
@@ -102,8 +103,6 @@ if __name__ == '__main__':
             final_results[clfs_name]["f1-score"].extend(results["f1-score"])
             final_results[clfs_name]["accuracy"].extend(results["accuracy"])
 
-    generate_csv(final_results, dataset_name="dataset_name", output_file="final-result.csv")
-
-    print(f"Calculando Média Final (F1 Score)")
-    final_mean = {clfs_name: np.mean() for clfs_name, results in final_results.items()}
-    print_final_mean(final_mean)
+    generate_csv(final_results, dataset_name="glass_identification", output_file="final-result.csv")
+    plot_boxplot(fname="16_09_25/csvs/final-result.csv", metric="f1-score")
+    plot_boxplot(fname="16_09_25/csvs/final-result.csv", metric="accuracy")

@@ -29,18 +29,15 @@ def data_set(fname):
     data = pd.read_csv(fname, skipinitialspace=True, skip_blank_lines=True)
 
     cols = list(data.columns)
-    drop_columns = []
-    string_columns = ['class','handicapped-infants','water-project-cost-sharing','adoption-of-the-budget-resolution','physician-fee-freeze','el-salvador-aid','religious-groups-in-schools','anti-satellite-test-ban','aid-to-nicaraguan-contras','mx-missile','immigration','synfuels-corporation-cutback','education-spending','superfund-right-to-sue','crime,duty-free-exports','export-administration-act-south-africa']
-    number_columns = []
+    drop_columns = ['id']
+    number_columns = ['ri','sodium','magnesium','aluminum','silicon','potassium','calcium','barium','iron']
 
     print("Removendo colunas enviesadas")
     remove_columns(data, drop_columns)
-    print("Normalizando dados qualitativos")
-    normalize_stringcol(data, string_columns)
     print("Normalizando dados quantitativos")
     normalize_numcol(data, number_columns)
 
-    targ = cols[0]
+    targ = cols[-1]
     targ_orig = data[targ]
     cls_orig, classes, cls_count = np.unique(targ_orig, return_inverse=True, return_counts=True)
     data = data.drop(columns=targ)
@@ -78,7 +75,7 @@ def show_unbalanced(data):
     max_val = np.max( result )
     print('desbalanceamento -->', max_val)
 
-FNAME = 'datasets/house-votes-84.csv'
+FNAME = 'datasets/glass.csv'
 
 if __name__ == '__main__':
     data = data_set(FNAME)
