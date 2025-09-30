@@ -6,7 +6,7 @@ from random import shuffle
 from sklearn import metrics
 
 from dataset_plot import data_set
-from csv_generator import generate_csv
+from csv_generator import generate_pivot_csv
 from boxplot_generator import plot_boxplot
 
 from sklearn.linear_model import Perceptron
@@ -103,6 +103,6 @@ if __name__ == '__main__':
             final_results[clfs_name]["f1-score"].extend(results["f1-score"])
             final_results[clfs_name]["accuracy"].extend(results["accuracy"])
 
-    generate_csv(final_results, dataset_name="glass_identification", output_file="final-result.csv")
+    generate_pivot_csv(final_results, dataset_name="glass_identification", output_file="final-result.csv")
     plot_boxplot(fname="16_09_25/csvs/final-result.csv", metric="f1-score")
     plot_boxplot(fname="16_09_25/csvs/final-result.csv", metric="accuracy")
