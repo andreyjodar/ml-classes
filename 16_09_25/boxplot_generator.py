@@ -7,7 +7,6 @@ def plot_boxplot(fname, metric):
 
     value_columns = [col for col in metric_dataframe.columns if col.startswith("v")]
     classifiers = metric_dataframe["classifier_name"].unique()
-
     clf_values = [metric_dataframe.loc[metric_dataframe['classifier_name'] == clf, value_columns].values.flatten() for clf in classifiers]
 
     plt.figure(figsize=(8, 6))
