@@ -1,4 +1,3 @@
-
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -32,7 +31,7 @@ def _handle_classifier(value):
         return 'knn'
     return value 
 
-def apllay_pattern(df):
+def apply_pattern(df):
     df['metric'] = df['metric'].apply(_handle_metric)
     df['classifier'] = df['classifier'].apply(_handle_classifier)
     return df
@@ -48,7 +47,7 @@ def load_csvs(basedir, result_file):
 
         df['author'] = fname[:-4]
         df.columns = MYCOLS
-        df = apllay_pattern(df)
+        df = apply_pattern(df)
 
         value_cols = [c for c in MYCOLS if c.startswith("v")]
         df[value_cols] = df[value_cols].apply(
@@ -64,47 +63,42 @@ def load_csvs(basedir, result_file):
     result.to_csv(output_path, index=False, float_format="%.10f")
 
 def generate_filtered_boxplot(file, classifier, metric):
+    # normalizar antes de filtrar
+    classifier = _handle_classifier(classifier)
+    metric = _handle_metric(metric)
+
     df = pd.read_csv(file)
     df = df[(df['classifier'] == classifier) & (df['metric'] == metric)]
 
     if df.empty:
-        print("Nenhuma ocorrência encontrada")
+        print("Nenhuma ocorrência encontrada para esse classificador/métrica.")
         return
 
     value_cols = [col for col in df.columns if col.startswith("v")]
     df_long = df.melt(id_vars=["dataset"], value_vars=value_cols,
                       var_name="fold", value_name="score")
 
+    if df_long['score'].isna().all():
+        print("Todos os valores são NaN, não foi possível gerar o boxplot.")
+        return
+
     plt.figure(figsize=(22, 10))
     df_long.boxplot(column="score", by="dataset", grid=False)
-    plt.title("Boxplot Classifier (KNN)")
+
+    plt.title(f"Boxplot - Classifier: {classifier.upper()} | Metric: {metric.upper()}")
     plt.suptitle("")
     plt.xlabel("Dataset")
-    plt.ylabel("F1 Score")
+    plt.ylabel("Score")
     plt.xticks(fontsize=8, rotation=60, ha="right")
     plt.tight_layout()
-    print(f'Salvando imagem: {classifier}-{metric}-boxplot.png"')
-    plt.savefig(file.replace('.csv', f'-{classifier}-{metric}-boxplot.png'))
+
+    out_path = file.replace('.csv', f'-{classifier}-{metric}-boxplot.png')
+    print(f"Salvando imagem: {out_path}")
+    plt.savefig(out_path)
 
 if __name__ == '__main__':
-    BASEDIR='C:/Users/Andrey/Documents/ml-classes/30_09_25/trabalhos'
-    RESULT='all.csv'
-    MYCOLS=['dataset', 'classifier', 'metric'] +[f'v{i}' for i in range (1,21)] + ['author']
+    BASEDIR = 'C:/Users/Andrey/Documents/ml-classes/30_09_25/trabalhos'
+    RESULT = 'all.csv'
+    MYCOLS = ['dataset', 'classifier', 'metric'] + [f'v{i}' for i in range(1, 21)] + ['author']
     load_csvs(BASEDIR, RESULT)
     generate_filtered_boxplot(os.path.join(BASEDIR, RESULT), 'knn', 'f1')
-
-# ------------------ abaixo, valores de CLASSIFICADOR desregulado
-# [
-#   'perceptron' 'svm' 'bayes' 'trees' 'knn' 'Perceptron' 'SVM' 
-#   'NaiveBayes' 'KNN' 'DecisionTree' 'Naive Bayes' 'Decision Tree' 
-#   ' perceptron' ' svm' ' bayes' ' trees' ' knn' 'GaussianNB' 'SVC' 
-#   'LogisticRegression' 'RandomForest' 'KNeighbors'
-# ]
-
-
-# ------------------ abaixo, valores de METRICAS desregulado
-# [
-#   'f1-score' 'accuracy' 'f1' 'F1-Score' 'Acurácia' 'ACC' 'F1' 
-#   'f1_score' 'acc' ' f1' ' acc' 'F1-Measure' 'Accuracy' 'Acc' 
-#   'F1_Score' 'Acuracia'
-# ]
